@@ -1,6 +1,6 @@
 # CodeInbox
 
-CodeInbox sends notifications from AI tools like Claude (using hooks) to Slack and other channels.
+[CodeInbox](https://codeinbox.com) sends notifications from AI tools like Claude (using hooks) to Slack and other channels.
 
 It's built by and uses [MagicBell](https://www.magicbell.com) to deliver notifications.
 
