@@ -44,3 +44,7 @@ The command you want to register is `codeinbox hook claude notification`
 
 - Check Claude's transcript with `CTRL+r`
 - Try a manual trigger `echo '{"session_id":"test","transcript_path":"/tmp/test.md","message":"Test message"}' |  codeinbox hook claude notification`
+
+## Want another hook, tool or channel?
+
+If you'd like to see a different Claude hook, AI tool, or channel, please create an issue.
