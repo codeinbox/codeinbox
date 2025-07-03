@@ -1,0 +1,72 @@
+version: 2
+
+# This is a release config to release codeinbox-cli to homebrew.
+# Releases are published to: https://github.com/codeinbox/homebrew-tap/releases
+# To create a new release, take the following steps
+# - have `goreleaser` installed (brew install goreleaser)
+# - have a clean git state
+# - run: git tag v1.x.x (semver)
+# - run: goreleaser release
+project_name: codeinbox
+
+before:
+  hooks:
+    - rm -rf codeinbox-dist
+    - go mod tidy
+
+builds:
+  - main: ./app/codeinbox/cmd
+    binary: codeinbox
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+
+dist: codeinbox-dist
+archives:
+  - formats: [tar.gz]
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+brews:
+  - repository:
+      owner: codeinbox
+      name: homebrew-tap
+      token: '{{ .Env.GITHUB_TOKEN }}'
+    directory: Formula
+    homepage: https://www.codeinbox.com
+    description: CodeInbox CLI.
+    license: MIT
+    name: codeinbox
+
+changelog:
+  disable: true
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+
+release:
+  github:
+    owner: codeinbox
+    name: homebrew-tap
+  footer: >-
+
+    ---
+
+    Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
