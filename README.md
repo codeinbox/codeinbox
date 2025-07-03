@@ -2,11 +2,11 @@
 
 CodeInbox sends notifications from AI tools like Claude (using hooks) to Slack and other channels.
 
-It's built by and uses [MagicBell](https://www.magicbell.com) for delivering notifications.
+It's built by and uses [MagicBell](https://www.magicbell.com) to deliver notifications.
 
 ## Installation
 
-Install it with Homebrew
+Install it with Homebrew.
 
 ```
 brew install codeinbox/homebrew-tap/codeinbox
@@ -14,21 +14,23 @@ brew install codeinbox/homebrew-tap/codeinbox
 
 ## Setup
 
-Login with your email to receive an auth token and enter it:
+1. Login with your email to receive an auth token and enter it in the prompt.
 
 ```
 codeinbox login {email}
 ```
 
-Finally, setup Slack by generating your setup URL
+2. Setup Slack by generating your setup URL
 
 ```
 codeinbox channels setup
 ```
 
+3. Follow the link and click "Enable" on the page to authenticate with Slack.
+
 ## Install the Claude hook
 
-Open Claude and enter the /hooks prompt
+Open Claude and enter the /hooks prompt to add the notification hook.
 
 ```
 claude
@@ -45,6 +47,6 @@ The command you want to register is `codeinbox hook claude notification`
 - Check Claude's transcript with `CTRL+r`
 - Try a manual trigger `echo '{"session_id":"test","transcript_path":"/tmp/test.md","message":"Test message"}' |  codeinbox hook claude notification`
 
-## Want another hook, tool or channel?
+## Want another hook, tool, or channel?
 
-If you'd like to see a different Claude hook, AI tool, or channel, please create an issue.
+Please create an issue if you'd like to see a different Claude hook, AI tool, or channel.
