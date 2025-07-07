@@ -35,7 +35,9 @@
     "vscode-scripts": "^1.0.5"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
     "magicbell": "^1.7.1",
+    "magicbell-js": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.4.0"
@@ -56,8 +58,8 @@
     "views": {
       "container": [
         {
-          "id": "inbox",
-          "name": "inbox",
+          "id": "codeinbox",
+          "name": "codeinbox",
           "type": "webview",
           "initialSize": 4
         }
@@ -67,24 +69,7 @@
     "configuration": {
       "type": "object",
       "title": "Code Inbox",
-      "properties": {
-        "CodeInbox.githubUsername": {
-          "type": "string",
-          "description": "Your github username."
-        },
-        "CodeInbox.magicBellApiKey": {
-          "type": "string",
-          "description": "Your MagicBell user account API key (_not_ the secret key)."
-        },
-        "CodeInbox.magicBellUserHmac": {
-          "type": "string",
-          "description": "The HMAC key corresponding to your MagicbBell user account."
-        },
-        "CodeInbox.magicBellApiUrl": {
-          "type": "string",
-          "description": "The MagicBell API URL (for testing)"
-        }
-      }
+      "properties": {}
     },
     "keybindings": [
       {
