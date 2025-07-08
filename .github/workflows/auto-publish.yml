@@ -21,6 +21,8 @@ jobs:
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
+        with:
+          working-directory: ./vscode
 
       - name: Build
         run: npm run build
