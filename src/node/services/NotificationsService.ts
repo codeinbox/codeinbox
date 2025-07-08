@@ -85,7 +85,7 @@ export class NotificationsService {
   }
 
   /**
-   * Manually trigger a fetch (only if authenticated)
+   * Manually trigger a fetch (only if authenticated) - shows loading state
    */
   async fetchNow(): Promise<void> {
     const { authStatus, getAuthToken } = this.store.getState()
@@ -101,18 +101,18 @@ export class NotificationsService {
       return
     }
 
-    await this.performFetch(token)
+    await this.performFetch(token, true) // true = show loading state
   }
 
   private async startFetching(): Promise<void> {
     console.log("NotificationsService: Starting notification fetching")
 
-    // Fetch immediately
+    // Fetch immediately with loading state
     await this.fetchNow()
 
-    // Set up polling every 30 seconds
+    // Set up polling every 30 seconds (silent updates)
     this.pollInterval = setInterval(() => {
-      this.fetchNow()
+      this.pollInBackground()
     }, 30000)
   }
 
@@ -128,7 +128,30 @@ export class NotificationsService {
     this.store.getState().setNotifications([])
   }
 
-  private async performFetch(jwt: string): Promise<void> {
+  /**
+   * Background polling - silent, no loading state, only update if changed
+   */
+  private async pollInBackground(): Promise<void> {
+    const { authStatus, getAuthToken } = this.store.getState()
+
+    if (authStatus !== "authenticated") {
+      return
+    }
+
+    const token = getAuthToken()
+    if (!token) {
+      return
+    }
+
+    await this.performFetch(token, false) // false = no loading state
+  }
+
+  /**
+   * Core fetch logic
+   * @param jwt - JWT token
+   * @param showLoading - Whether to show loading state
+   */
+  private async performFetch(jwt: string, showLoading: boolean): Promise<void> {
     if (this.isLoading) {
       console.log("NotificationsService: Fetch already in progress, skipping")
       return
@@ -136,28 +159,75 @@ export class NotificationsService {
 
     this.isLoading = true
 
-    // Set loading state
-    this.store.getState().setNotificationsLoading(true)
+    // Only set loading state for manual/initial fetches
+    if (showLoading) {
+      this.store.getState().setNotificationsLoading(true)
+    }
 
     try {
-      console.log("NotificationsService: Fetching notifications...")
-      const notifications = await this.fetcher.fetchNotifications(jwt)
+      const newNotifications = await this.fetcher.fetchNotifications(jwt)
 
-      console.log(
-        `NotificationsService: Fetched ${notifications.length} notifications`
+      // Check if notifications have actually changed
+      const currentNotifications = this.store.getState().notifications
+      const hasChanged = this.notificationsChanged(
+        currentNotifications,
+        newNotifications
       )
-      this.store.getState().setNotifications(notifications)
+
+      if (hasChanged) {
+        console.log(
+          `NotificationsService: Fetched ${newNotifications.length} notifications (${showLoading ? "manual" : "background"})`
+        )
+        this.store.getState().setNotifications(newNotifications)
+      } else if (showLoading) {
+        // For manual fetches, still update to clear loading state
+        this.store.getState().setNotifications(newNotifications)
+      }
     } catch (error) {
       console.error(
         "NotificationsService: Failed to fetch notifications:",
         error
       )
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch notifications"
-      this.store.getState().setNotificationsError(errorMessage)
+
+      // Only show errors for manual fetches, fail silently for background polls
+      if (showLoading) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch notifications"
+        this.store.getState().setNotificationsError(errorMessage)
+      }
     } finally {
       this.isLoading = false
     }
+  }
+
+  /**
+   * Compare two notification arrays to see if they've changed
+   */
+  private notificationsChanged(
+    current: Notification[],
+    incoming: Notification[]
+  ): boolean {
+    if (current.length !== incoming.length) {
+      return true
+    }
+
+    // Compare by ID and read status (most common changes)
+    for (let i = 0; i < current.length; i++) {
+      const currentItem = current[i]
+      const incomingItem = incoming[i]
+
+      if (
+        currentItem.id !== incomingItem.id ||
+        currentItem.readAt !== incomingItem.readAt ||
+        currentItem.seenAt !== incomingItem.seenAt
+      ) {
+        return true
+      }
+    }
+
+    return false
   }
 
   /**
