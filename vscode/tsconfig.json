@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "paths": {
+            "vscode-scripts": ["./node_modules/vscode-scripts/index.ts"],
+        },
+        "plugins": [{
+            "name": "typescript-plugin-css-modules"
+        }]
+    },
+}

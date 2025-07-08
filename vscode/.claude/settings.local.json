@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codeinbox hook claude notification"
+          }
+        ]
+      }
+    ]
+  }
+}
