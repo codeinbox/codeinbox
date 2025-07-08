@@ -31,6 +31,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
+          cwd: ./vscode
           publish: "./node_modules/.bin/vsce publish -p ${{ secrets.VSCE_PAT }} --no-dependencies"
           commit: "chore: version packages"
           title: "chore: version packages"
