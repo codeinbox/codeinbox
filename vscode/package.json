@@ -1,7 +1,7 @@
 {
   "name": "codeinbox",
   "displayName": "CodeInbox - Stay in the zone, not in the dark",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "View real-time updates from event sources such as Claude Code, and others, for a more productive workflow.",
   "main": "dist/node/extension.js",
   "engines": {
