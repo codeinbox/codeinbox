@@ -5,7 +5,6 @@ import { getChromiumStore } from "vscode-scripts"
 import { State } from "../state"
 
 import styles from "./box.module.css"
-import globalStyles from "./global.module.css"
 
 const [_store, vscode] = getChromiumStore<State>()
 
@@ -335,8 +334,6 @@ export default function Box() {
                   </div>
 
                   <div className={styles.notificationContent}>{n.content}</div>
-
-                  {/* {isUnread && <div className={styles.unreadIndicator}></div>} */}
 
                   <div
                     className={styles.categoryStripe}

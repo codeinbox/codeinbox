@@ -1,5 +1,6 @@
 import type { Store } from "../../state"
 import { Client, Notification } from "magicbell-js/user-client"
+import { Socket } from "magicbell-js/socket"
 
 export interface NotificationsFetcher {
   fetchNotifications(jwt: string): Promise<Notification[]>
@@ -40,6 +41,8 @@ export class NotificationsService {
   private store: Store
   private isLoading = false
   private pollInterval: NodeJS.Timeout | null = null
+  private socketClient: Socket | null = null
+  private client: Client | null = null
 
   constructor(
     store: Store,
@@ -107,29 +110,113 @@ export class NotificationsService {
   private async startFetching(): Promise<void> {
     console.log("NotificationsService: Starting notification fetching")
 
-    // Fetch immediately with loading state
+    const { getAuthToken } = this.store.getState()
+    const token = getAuthToken()
+
+    if (!token) {
+      console.log("NotificationsService: Cannot start - no token")
+      return
+    }
+
+    // Initialize client
+    this.client = new Client({
+      token: token,
+    })
+
+    // Fetch initial notifications with loading state
     await this.fetchNow()
 
-    // Set up polling every 30 seconds (silent updates)
+    // Set up socket connection for real-time updates
+    await this.setupSocketConnection()
+
+    // Fallback: Set up polling every 5 minutes as backup
+    // This ensures we don't miss notifications if socket connection fails
     this.pollInterval = setInterval(() => {
       this.pollInBackground()
-    }, 30000)
+    }, 300000) // 5 minutes
+  }
+
+  private async setupSocketConnection(): Promise<void> {
+    if (!this.client) {
+      console.error("NotificationsService: Cannot setup socket - no client")
+      return
+    }
+
+    try {
+      console.log("NotificationsService: Setting up socket connection")
+
+      this.socketClient = new Socket(this.client)
+
+      // Listen for new notifications
+      this.socketClient.listen((notification: Notification) => {
+        console.log(
+          "NotificationsService: New notification received:",
+          notification.title
+        )
+        this.handleNewNotification(notification)
+      })
+
+      console.log("NotificationsService: Socket connection established")
+    } catch (error) {
+      console.error(
+        "NotificationsService: Failed to setup socket connection:",
+        error
+      )
+      // If socket setup fails, we'll rely on the polling fallback
+    }
+  }
+
+  private handleNewNotification(newNotification: Notification): void {
+    const currentNotifications = this.store.getState().notifications
+
+    // Check if this notification already exists (by ID)
+    const existingIndex = currentNotifications.findIndex(
+      (n) => n.id === newNotification.id
+    )
+
+    if (existingIndex >= 0) {
+      // Update existing notification (e.g., read status changed)
+      const updatedNotifications = [...currentNotifications]
+      updatedNotifications[existingIndex] = newNotification
+      this.store.getState().setNotifications(updatedNotifications)
+    } else {
+      // Add new notification to the beginning of the list
+      this.store
+        .getState()
+        .setNotifications([newNotification, ...currentNotifications])
+    }
   }
 
   private stopFetching(): void {
     console.log("NotificationsService: Stopping notification fetching")
 
+    // Close socket connection
+    if (this.socketClient) {
+      try {
+        this.socketClient.disconnect()
+        this.socketClient = null
+        console.log("NotificationsService: Socket connection closed")
+      } catch (error) {
+        console.error("NotificationsService: Error closing socket:", error)
+      }
+    }
+
+    // Clear polling interval
     if (this.pollInterval) {
       clearInterval(this.pollInterval)
       this.pollInterval = null
     }
+
+    // Clear client
+    this.client = null
 
     // Clear notifications when stopping (user logged out)
     this.store.getState().setNotifications([])
   }
 
   /**
-   * Background polling - silent, no loading state, only update if changed
+   * Background polling - now used as fallback only
+   * Runs every 5 minutes instead of 30 seconds since socket handles real-time updates
    */
   private async pollInBackground(): Promise<void> {
     const { authStatus, getAuthToken } = this.store.getState()
@@ -143,6 +230,14 @@ export class NotificationsService {
       return
     }
 
+    // Only poll if socket connection is not active
+    if (this.socketClient && this.socketClient.isListening()) {
+      return // Socket is working fine, no need to poll
+    }
+
+    console.log(
+      "NotificationsService: Running background poll (socket not active)"
+    )
     await this.performFetch(token, false) // false = no loading state
   }
 
@@ -235,5 +330,15 @@ export class NotificationsService {
    */
   setFetcher(fetcher: NotificationsFetcher): void {
     this.fetcher = fetcher
+  }
+
+  /**
+   * Get connection status for debugging
+   */
+  getConnectionStatus(): { socket: boolean; polling: boolean } {
+    return {
+      socket: this.socketClient?.isListening() || false,
+      polling: this.pollInterval !== null,
+    }
   }
 }
