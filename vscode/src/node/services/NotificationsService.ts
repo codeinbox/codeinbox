@@ -215,8 +215,8 @@ export class NotificationsService {
   }
 
   /**
-   * Background polling - now used as fallback only
-   * Runs every 5 minutes instead of 30 seconds since socket handles real-time updates
+   * Background polling
+   * Runs every 5 minutes as a fallback, since socket handles real-time updates
    */
   private async pollInBackground(): Promise<void> {
     const { authStatus, getAuthToken } = this.store.getState()
