@@ -1,7 +1,7 @@
 {
   "name": "codeinbox",
   "displayName": "CodeInbox - GitHub, Claude, and other notifications",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "Notifications from GitHub, Claude, and other tools, so you can stay in the zone, not in the dark!",
   "main": "dist/node/extension.js",
   "engines": {
@@ -9,8 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/code-inbox/code-inbox.git"
+    "url": "https://github.com/codeinbox/codeinbox.git"
   },
+  "homepage": "https://codeinbox.com",
   "publisher": "CodeInbox",
   "icon": "public/logo.png",
   "scripts": {
