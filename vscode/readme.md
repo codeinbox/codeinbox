@@ -2,7 +2,7 @@
 
 > Minimize distractions and context-switching for developers by seamlessly incorporating information from your CI (Continuous Integration) pipeline and GitHub actions statuses. Stay focused, collaborate efficiently, and take control of your development tasks right within VS Code.
 
-[CodeInbox](https://github.com/code-inbox/code-inbox "Open CodeInbox on GitHub") is a powerful open-source extension for [Visual Studio Code](https://code.visualstudio.com) designed to enhance your development experience by integrating GitHub actions and CI information directly into your coding environment.
+[CodeInbox](https://github.com/codeinbox/codeinbox "Open CodeInbox on GitHub") is a powerful open-source extension for [Visual Studio Code](https://code.visualstudio.com) designed to enhance your development experience by integrating GitHub actions and CI information directly into your coding environment.
 
 CodeInbox empowers developers to stay in the flow, eliminating the need for constant context-switching between coding and checking CI statuses. With the ability to display notifications, manage pull requests, and more &mdash; all from within VS Code &mdash; you can keep your focus on writing code and collaborating with your team.
 
@@ -51,7 +51,7 @@ CodeInbox is an open-source project that welcomes contributions from the communi
 
 ## Support and Feedback
 
-For any questions, issues, or feedback, feel free to reach out on the [GitHub Issues](https://github.com/your-username/codeinbox/issues) page. We're here to help and improve CodeInbox based on your needs.
+For any questions, issues, or feedback, feel free to reach out on the [GitHub Issues](https://github.com/codeinbox/codeinbox/issues) page. We're here to help and improve CodeInbox based on your needs.
 
 ## License
 
